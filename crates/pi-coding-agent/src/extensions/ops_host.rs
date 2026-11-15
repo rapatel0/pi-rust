@@ -48,7 +48,7 @@ pub(super) fn theme_snapshot(theme: &crate::theme::Theme) -> Value {
     })
 }
 
-fn builtin_info(runner: &ExtensionRunner, name: &str) -> Result<Value, JsError> {
+pub(crate) fn builtin_info(runner: &ExtensionRunner, name: &str) -> Result<Value, JsError> {
     let tool = crate::tools::create_tool(name, runner.cwd()).ok_or_else(|| error(format!("Unknown tool: {name}")))?;
     let info = crate::tools::tool_info(name);
     Ok(json!({

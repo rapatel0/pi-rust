@@ -287,3 +287,18 @@ async fn queued_input_runs_input_handlers_and_refuses_extension_commands() {
     h.session.abort().await;
     let _ = running.await;
 }
+
+#[tokio::test(flavor = "multi_thread")]
+async fn builtin_tool_factories_run_during_extension_load() {
+    let source = r#"import { createReadToolDefinition } from "@earendil-works/pi-coding-agent";
+export default function (pi) {
+	const def = createReadToolDefinition("/tmp");
+	def.name = "wrapped_read";
+	pi.registerTool(def);
+}
+"#;
+    let h = harness(Setup { files: vec![("wrap.ts", source.into())], load: vec!["wrap.ts"], ..Setup::default() }).await;
+    assert!(h.errors().is_empty(), "{:?}", h.errors());
+    let tools = h.session.all_tools();
+    assert!(tools.iter().any(|tool| tool.name == "wrapped_read"), "{tools:?}");
+}

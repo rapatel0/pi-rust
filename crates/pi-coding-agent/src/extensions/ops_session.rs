@@ -353,6 +353,8 @@ pub(crate) fn sync(runner: &ExtensionRunner, op: &str, args: &Args) -> Result<Ho
             let options = prompt_options_from_json(&args.json(0), runner.cwd());
             json!(crate::system_prompt::render_system_prompt(&options).map_err(error)?)
         }
+        // Builtin tool metadata is static; extensions build definitions while they load.
+        ("tools", "builtinInfo") => super::ops_host::builtin_info(runner, &args.str(0)?)?,
         _ => {
             let target = args.u64(0);
             let session = runner.target_session(target)?;
